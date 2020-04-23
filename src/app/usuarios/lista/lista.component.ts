@@ -1,25 +1,30 @@
 import { Component, OnInit } from '@angular/core';
-import { UsuarioService } from '../../services/usuario.service';
 import { User } from '../../models/user.model';
+import { Store } from '@ngrx/store';
+import { AppState } from 'src/app/store/app.reducer';
+
+import * as userActions from '../../store/actions';
 
 @Component({
   selector: 'app-lista',
   templateUrl: './lista.component.html',
-  styles: [
-  ]
+  styles: [],
 })
 export class ListaComponent implements OnInit {
-
   users: User[] = [];
+  loading: boolean;
+  error: any;
 
-  constructor(private userService: UsuarioService) { }
+  constructor(private store: Store<AppState>) {}
 
   ngOnInit(): void {
-    this.userService.getUsers()
-    .subscribe(users => {
-      console.log(users);
-      this.users = users;
-    })
-  }
 
+    this.store.select('usuarios').subscribe(usuarios => {
+      this.users = usuarios.users;
+      this.loading = usuarios.loading;
+      this.error = usuarios.error;
+    })
+
+    this.store.dispatch(new userActions.CargarUsuarios());
+  }
 }
